@@ -115,6 +115,12 @@ Note that `--in-place' is used by default."
   (insert-file-contents filename))
 
 
+;; Borrowed and modified from here:
+;; http://www.dougwoos.com/2013/12/24/posting-to-jekyll-with-emacs.html
+(defun sluggify (str)
+  (replace-regexp-in-string
+   "[^a-z0-9-\w]" "-" (downcase str)))
+
 (defun py-yapf-bf--apply-executable-to-buffer (executable-name
 						       executable-call
 						       only-on-region
@@ -122,7 +128,7 @@ Note that `--in-place' is used by default."
   "Formats the current buffer according to the executable"
   (when (not (executable-find executable-name))
     (error (format "%s command not found." executable-name)))
-  (let ((tmpfile (make-temp-file executable-name nil (concat "." file-extension)))
+  (let ((tmpfile (make-temp-file (concat executable-name (sluggify buffer-file-name)) nil (concat "." file-extension)))
         (patchbuf (get-buffer-create (format "*%s patch*" executable-name)))
         (errbuf (get-buffer-create (format "*%s Errors*" executable-name)))
         (coding-system-for-read buffer-file-coding-system)
